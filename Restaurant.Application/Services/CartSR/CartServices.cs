@@ -15,24 +15,17 @@ namespace Restaurant.Application.Services.CartSR
 {
     public class CartServices : ICartServices
     {
-        private readonly IGenericRebosatory<Cart> GenCart;
-        private readonly IGenericRebosatory<Meal> GenMeal;
-        private readonly IGenericRebosatory<Customer> GenCustomer;
-        private readonly IGenericRebosatory<CartItem> GenCartItem;
         private readonly IMapper mapper;
         private readonly IUnitOfWork unitOfWork;
-        public CartServices(IGenericRebosatory<Cart> GenCart, IGenericRebosatory<Meal> GenMeal, IGenericRebosatory<CartItem> GenCartItem, IGenericRebosatory<Customer> GenCustomer, IMapper mapper, IUnitOfWork unitOfWork)
+        public CartServices( IMapper mapper, IUnitOfWork unitOfWork)
         {
-            this.GenCart = GenCart;
-            this.GenMeal = GenMeal;
-            this.GenCartItem = GenCartItem;
-            this.GenCustomer = GenCustomer;
             this.mapper = mapper;
             this.unitOfWork = unitOfWork;
         }
         public async Task<List<AllCartDTO>> GetAllCartsAsync()
         {
-            var res = await GenCart.GetQueryable(c => c.CartItems)
+            var res = await unitOfWork.Genunit<Cart>().GetQueryable(c => c.CartItems)
+            //var res = await GenCart.GetQueryable(c => c.CartItems)
                 .Include(c => c.CartItems)
                 .ThenInclude(c => c.Meal)
                 .Include(c => c.Customer)
@@ -45,7 +38,7 @@ namespace Restaurant.Application.Services.CartSR
 
         public async Task<AllCartDTO> GetCartByIdAsync(int id)
         {
-            var res=await GenCart.GetQueryable(c=>c.CartItems)
+            var res=await unitOfWork.Genunit<Cart>().GetQueryable(c=>c.CartItems)
                 .Include(c=>c.CartItems)
                 .ThenInclude(c=>c.Meal)
                 .Include(c=>c.Customer)
@@ -58,12 +51,13 @@ namespace Restaurant.Application.Services.CartSR
         }
         public async Task<AllCartItemDTO> CreateCartAsync(int userid, int mealid, int quantity)
         {
-            var customer= await GenCustomer.GetById(c => c.UserId == userid);
+            //var customer= await GenCustomer.GetById(c => c.UserId == userid);
+            var customer= await unitOfWork.Genunit<Customer>().GetById(c => c.UserId == userid);
             if (customer == null)
                 throw new NotFoundException($"Not Found Customer with this UserId {userid}");
 
             //var cart = await GenCart.GetById(c => c.CustomerId == customer.CustomerId, c => c.CartItems);
-            var cart = await GenCart
+            var cart = await unitOfWork.Genunit<Cart>()
                  .GetQueryable(c => c.CartItems)
                  .Where(c => c.CustomerId == customer.CustomerId)
                  .Include(c => c.CartItems)
@@ -77,10 +71,10 @@ namespace Restaurant.Application.Services.CartSR
                     CustomerId = customer.CustomerId,
                     CartItems = new List<CartItem>()
                 };
-               await GenCart.Create(cart);
+               await unitOfWork.Genunit<Cart>().Create(cart);
                await unitOfWork.SaveChanges();
             }
-            var meal = await GenMeal.GetById(m => m.MealId == mealid);
+            var meal = await unitOfWork.Genunit<Meal>().GetById(m => m.MealId == mealid);
             if (meal == null)
                 throw new Exception($"Not Found Meal with this Id {mealid}");
 
@@ -99,7 +93,8 @@ namespace Restaurant.Application.Services.CartSR
             if (cartItem != null)
             {
                 cartItem.Quantity += quantity;
-                GenCartItem.update(cartItem);
+                //GenCartItem.update(cartItem);
+                 unitOfWork.Genunit<CartItem>().update(cartItem);
             }
             else
             {
@@ -118,11 +113,11 @@ namespace Restaurant.Application.Services.CartSR
         }
         public async Task<AllCartItemDTO> UpdateCartAsync(int userid, int mealid, int quantity)
         {
-            var customer =await GenCustomer.GetById(c => c.UserId == userid);
+            var customer =await unitOfWork.Genunit<Customer>().GetById(c => c.UserId == userid);
             if (customer == null)
                 throw new NotFoundException($"Not Found Customer with this UserId {userid}");
 
-            var cart = await GenCart
+            var cart = await unitOfWork.Genunit<Cart>()
               .GetQueryable(c => c.CartItems)
               .Where(c => c.CustomerId == customer.CustomerId)
               .Include(c => c.CartItems)
@@ -142,8 +137,9 @@ namespace Restaurant.Application.Services.CartSR
 
             if (quantity == 0)
             {
-                GenCartItem.delete(cartItem); // Remove the item from the cart
-               await unitOfWork.SaveChanges();
+                //GenCartItem.delete(cartItem); // Remove the item from the cart
+                unitOfWork.Genunit<CartItem>().delete(cartItem); // Remove the item from the cart
+                await unitOfWork.SaveChanges();
                 throw new BadRequestException("Meal removed from cart as quantity is set to 0");
 
             }
@@ -152,7 +148,8 @@ namespace Restaurant.Application.Services.CartSR
                     throw new BadRequestException($"only {meal.Quantity} are available in stock");
 
                 cartItem.Quantity = quantity;
-                GenCartItem.update(cartItem);
+                //GenCartItem.update(cartItem);
+                unitOfWork.Genunit<CartItem>().update(cartItem);
              
              await  unitOfWork.SaveChanges();
                var data = mapper.Map<AllCartItemDTO>(cartItem);
@@ -161,10 +158,10 @@ namespace Restaurant.Application.Services.CartSR
         }
         public async Task<AllCartDTO> GetCartSummaryAsync(int userid)
         {
-           var customer =await GenCustomer.GetById(c => c.UserId == userid);
+           var customer =await unitOfWork.Genunit<Customer>().GetById(c => c.UserId == userid);
             if (customer == null)
                 throw new NotFoundException($"Not Found Customer with this UserId {userid}");
-            var cart = await GenCart
+            var cart = await unitOfWork.Genunit<Cart>()
                 .GetQueryable(c => c.CartItems)
                 .Where(c => c.CustomerId == customer.CustomerId)
                 .Include(c => c.CartItems)
@@ -180,10 +177,10 @@ namespace Restaurant.Application.Services.CartSR
 
         public async Task<bool> RemoveMealAsync(int mealid, int userid)
         {
-           var customer =await GenCustomer.GetById(c => c.UserId == userid);
+           var customer =await unitOfWork.Genunit<Customer>().GetById(c => c.UserId == userid);
             if (customer == null)
                 throw new NotFoundException($"Not Found Customer with this UserId {userid}");
-            var cart = GenCart
+            var cart = unitOfWork.Genunit<Cart>()
                 .GetQueryable(c => c.CartItems)
                 .Where(c => c.CustomerId == customer.CustomerId)
                 .Include(c => c.CartItems)
@@ -194,16 +191,16 @@ namespace Restaurant.Application.Services.CartSR
             var cartItem = cart.CartItems.FirstOrDefault(ci => ci.MealId == mealid);
             if (cartItem == null)
                 throw new NotFoundException($"Not Found Meal with this Id {mealid} in Cart");
-            GenCartItem.delete(cartItem);
+            unitOfWork.Genunit<CartItem>().delete(cartItem);
            await unitOfWork.SaveChanges();
             return true;
         }
         public async Task<bool> ClereCartAsync(int userid)
         {
-            var customer = await GenCustomer.GetById(c => c.UserId == userid);
+            var customer = await unitOfWork.Genunit<Customer>().GetById(c => c.UserId == userid);
             if (customer == null)
                 throw new NotFoundException($"Not Found Customer with this UserId {userid}");
-            var cart = await GenCart
+            var cart = await unitOfWork.Genunit<Cart>()
                 .GetQueryable(c => c.CartItems)
                 .Where(c => c.CustomerId == customer.CustomerId)
                 .Include(c => c.CartItems)
@@ -214,7 +211,7 @@ namespace Restaurant.Application.Services.CartSR
 
             foreach (var item in cart.CartItems)
             {
-                GenCartItem.delete(item);
+                unitOfWork.Genunit<CartItem>().delete(item);
             }
            await unitOfWork.SaveChanges();
             return true;

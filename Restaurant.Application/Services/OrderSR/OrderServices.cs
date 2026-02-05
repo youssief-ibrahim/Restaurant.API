@@ -18,26 +18,13 @@ namespace Restaurant.Application.Services.OrderSR
 {
     public class OrderServices : IOrderServices
     {
-        private readonly IGenericRebosatory<Order> GenOrder;
-        private readonly IGenericRebosatory<OrderItem> GenOrderItem;
-        private readonly IGenericRebosatory<CartItem> GenCartItem;
-        private readonly IGenericRebosatory<Customer> GenCustomer;
-        private readonly IGenericRebosatory<Meal> GenMeal;
-        private readonly IGenericRebosatory<Cart> GenCart;
-        private readonly IGenericRebosatory<Payment> GenPayment;
+
         private readonly IUnitOfWork unitOfWork;
         private readonly IMapper mapper;
         private readonly IStringLocalizer<OrderServices> localizer;
 
-        public OrderServices(IGenericRebosatory<Order> GenOrder, IGenericRebosatory<OrderItem> GenOrderItem, IGenericRebosatory<Customer> GenCustomer, IGenericRebosatory<Meal> GenMeal, IGenericRebosatory<Cart> GenCart, IGenericRebosatory<CartItem> GenCartItem, IGenericRebosatory<Payment> GenPayment, IUnitOfWork unitOfWork,IMapper mapper, IStringLocalizer<OrderServices> localizer)
+        public OrderServices( IUnitOfWork unitOfWork,IMapper mapper, IStringLocalizer<OrderServices> localizer)
         {
-            this.GenOrder = GenOrder;
-            this.GenOrderItem = GenOrderItem;
-            this.GenCustomer = GenCustomer;
-            this.GenMeal = GenMeal;
-            this.GenCart = GenCart;
-            this.GenCartItem = GenCartItem;
-            this.GenPayment = GenPayment;
             this.unitOfWork = unitOfWork;
             this.mapper = mapper;
             this.localizer = localizer;
@@ -45,7 +32,7 @@ namespace Restaurant.Application.Services.OrderSR
 
         public async Task<List<AllOrderDTO>> GetAllOrdersAsync()
         {
-            var order = await GenOrder.GetAll();
+            var order = await unitOfWork.Genunit<Order>().GetAll();
             if (order == null || !order.Any())
                 throw new NotFoundException("No Orders Found");
             var orderDto = mapper.Map<List<AllOrderDTO>>(order);
@@ -54,7 +41,7 @@ namespace Restaurant.Application.Services.OrderSR
 
         public async Task<AllOrderDTO> GetOrderByIdAsync(int orderId)
         {
-            var order = await GenOrder.GetById(s => s.OrderId == orderId);
+            var order = await unitOfWork.Genunit<Order>().GetById(s => s.OrderId == orderId);
             if (order == null)
                 throw new NotFoundException($"No Found Order with  id {orderId}");
             var orderDto = mapper.Map<AllOrderDTO>(order);
@@ -63,7 +50,7 @@ namespace Restaurant.Application.Services.OrderSR
 
         public  async Task<List<AllOrderItemDTO>> GetOrderItemsAsync(int orderId)
         {
-            var res = await GenOrderItem.FindAll(s => s.OrderId == orderId);
+            var res = await unitOfWork.Genunit<OrderItem>().FindAll(s => s.OrderId == orderId);
             if (!res.Any())
                 throw new NotFoundException($"No Found Order Items with  order id {orderId}");
             var orderDto = mapper.Map<List<AllOrderItemDTO>>(res);
@@ -72,7 +59,7 @@ namespace Restaurant.Application.Services.OrderSR
 
         public async Task<OrderStatusDTO> GetOrderStatusAsync(int orderId)
         {
-            var order = await GenOrder.GetById(s => s.OrderId == orderId);
+            var order = await unitOfWork.Genunit<Order>().GetById(s => s.OrderId == orderId);
             if (order == null)
                 throw new NotFoundException($"No Found Order with  id {orderId}");
             var data = mapper.Map<OrderStatusDTO>(order);
@@ -84,14 +71,14 @@ namespace Restaurant.Application.Services.OrderSR
             await unitOfWork.BeginTransactionAsync();
             try
             {
-                var customer = await GenCustomer.GetById(s => s.UserId == userid);
+                var customer = await unitOfWork.Genunit<Customer>().GetById(s => s.UserId == userid);
                 if (customer == null)
                     throw new NotFoundException($"No Found Customer with  userid {userid}");
-                var cart = await GenCart.GetById(s => s.CustomerId == customer.CustomerId);
+                var cart = await unitOfWork.Genunit<Cart>().GetById(s => s.CustomerId == customer.CustomerId);
                 if (cart == null)
                     throw new NotFoundException($"No Found Cart for Customer with  userid {userid}");
 
-                var cartItems = await GenCartItem.FindAll(s => s.CartId == cart.CartId, r => r.Meal);
+                var cartItems = await unitOfWork.Genunit<CartItem>().FindAll(s => s.CartId == cart.CartId, r => r.Meal);
                 if (!cartItems.Any())
                     throw new NotFoundException($"No Found CartItems in Cart for Customer with  userid {userid}");
 
@@ -104,7 +91,7 @@ namespace Restaurant.Application.Services.OrderSR
                 var order = mapper.Map<Order>(dto);
                 order.CustomerId = customer.CustomerId;
                 order.TotalPrice = cartItems.Sum(i => i.Quantity * i.Meal.Price);
-                await GenOrder.Create(order);
+                await unitOfWork.Genunit<Order>().Create(order);
                 await unitOfWork.SaveChanges();
                
 
@@ -118,7 +105,7 @@ namespace Restaurant.Application.Services.OrderSR
                         UnitPrice = item.Meal.Price
                     };
 
-                    await GenOrderItem.Create(orderItem);
+                    await unitOfWork.Genunit<OrderItem>().Create(orderItem);
                 }
                 await unitOfWork.SaveChanges();
                 var payment=new Payment
@@ -128,10 +115,10 @@ namespace Restaurant.Application.Services.OrderSR
                     Provider = "Stripe",
                     Status = PaymentStatus.Pending
                 };
-                await GenPayment.Create(payment);
+                await unitOfWork.Genunit<Payment>().Create(payment);
                 await unitOfWork.SaveChanges();
                 cart.OrderId = order.OrderId;
-                GenCart.update(cart);
+                unitOfWork.Genunit<Cart>().update(cart);
                 await unitOfWork.SaveChanges();
                 await unitOfWork.CommitAsync();
 
@@ -152,11 +139,11 @@ namespace Restaurant.Application.Services.OrderSR
             await unitOfWork.BeginTransactionAsync();
             try
             {
-                var customer = await GenCustomer.GetById(s => s.UserId == userid);
+                var customer = await unitOfWork.Genunit<Customer>().GetById(s => s.UserId == userid);
                 if (customer == null)
                     throw new NotFoundException($"No Found Customer with  userid {userid}");
 
-                var cart = await GenCart.GetQueryable(c => c.CartItems)
+                var cart = await unitOfWork.Genunit<Cart>().GetQueryable(c => c.CartItems)
                     .Where(c => c.CustomerId == customer.CustomerId)
                     .Include(c => c.CartItems)
                     .ThenInclude(ci => ci.Meal)
@@ -165,11 +152,11 @@ namespace Restaurant.Application.Services.OrderSR
                 if (cart == null)
                     throw new NotFoundException($"No Found Cart for Customer with  userid {userid}");
 
-                var previousorder = await GenOrder.GetById(s => s.OrderId == orderId && s.CustomerId == customer.CustomerId);
+                var previousorder = await unitOfWork.Genunit<Order>().GetById(s => s.OrderId == orderId && s.CustomerId == customer.CustomerId);
                 if (previousorder == null)
                     throw new NotFoundException($"No Found Order with  id {orderId} for Customer with  userid {userid}");
 
-                var previousOrderItems = await GenOrderItem.FindAll(s => s.OrderId == orderId, r => r.Meal);
+                var previousOrderItems = await unitOfWork.Genunit<OrderItem>().FindAll(s => s.OrderId == orderId, r => r.Meal);
                 if (!previousOrderItems.Any())
                     throw new NotFoundException($"Order has no items");
 
@@ -191,7 +178,7 @@ namespace Restaurant.Application.Services.OrderSR
                     if (cartItem != null)
                     {
                         cartItem.Quantity += item.Quantity;
-                        GenCartItem.update(cartItem);
+                        unitOfWork.Genunit<CartItem>().update(cartItem);
                     }
                     else
                     {
@@ -219,45 +206,45 @@ namespace Restaurant.Application.Services.OrderSR
 
         public async Task<AllOrderDTO> UpdateOrderStatusAsync(int orderId, OrderStatus status, int userid)
         {
-            var customer = await GenCustomer.GetById(s => s.UserId == userid);
+            var customer = await unitOfWork.Genunit<Customer>().GetById(s => s.UserId == userid);
             if (customer == null)
                 throw new NotFoundException($"No Found Customer with  userid {userid}");
-            var order = await GenOrder.GetById(s => s.OrderId == orderId && s.CustomerId == customer.CustomerId);
+            var order = await unitOfWork.Genunit<Order>().GetById(s => s.OrderId == orderId && s.CustomerId == customer.CustomerId);
             if (order == null)
                 throw new NotFoundException($"No Found Order with  id {orderId}");
             if (status != OrderStatus.Cancelled)
                 throw new BadRequestException("You can only cancel the order");
             order.Status = status;
-            GenOrder.update(order);
+            unitOfWork.Genunit<Order>().update(order);
             await unitOfWork.SaveChanges();
             var orderDto = mapper.Map<AllOrderDTO>(order);
             return orderDto;
         }
         public async Task<AllOrderDTO> CancleOrderAsync(int orderId, int userid)
         {
-            var customer = await GenCustomer.GetById(s => s.UserId == userid);
+            var customer = await unitOfWork.Genunit<Customer>().GetById(s => s.UserId == userid);
             if (customer == null)
                 throw new NotFoundException($"No Found Customer with  userid {userid}");
-            var order = await GenOrder.GetById(s => s.OrderId == orderId && s.CustomerId == customer.CustomerId);
+            var order = await unitOfWork.Genunit<Order>().GetById(s => s.OrderId == orderId && s.CustomerId == customer.CustomerId);
             if (order == null)
                 throw new NotFoundException($"No Found Order with  id {orderId}");
             if (order.Status == OrderStatus.Cancelled)
                 throw new BadRequestException($"Order with id {orderId} is already canceled.");
             order.Status = OrderStatus.Cancelled;
-            GenOrder.update(order);
+            unitOfWork.Genunit<Order>().update(order);
             await unitOfWork.SaveChanges();
             var orderDto = mapper.Map<AllOrderDTO>(order);
             return orderDto;
         }
         public async Task<bool> DeleteOrderAsynce(int orderId, int userid)
         {
-            var customer = await GenCustomer.GetById(s => s.UserId == userid);
+            var customer = await unitOfWork.Genunit<Customer>().GetById(s => s.UserId == userid);
             if (customer == null)
                 throw new NotFoundException($"No Found Customer with  userid {userid}");
-            var order = await GenOrder.GetById(s => s.OrderId == orderId && s.CustomerId == customer.CustomerId);
+            var order = await unitOfWork.Genunit<Order>().GetById(s => s.OrderId == orderId && s.CustomerId == customer.CustomerId);
             if (order == null)
                 throw new NotFoundException($"No Found Order with  id {orderId}");
-            GenOrder.delete(order);
+            unitOfWork.Genunit<Order>().delete(order);
             await unitOfWork.SaveChanges();
             return true;
         }

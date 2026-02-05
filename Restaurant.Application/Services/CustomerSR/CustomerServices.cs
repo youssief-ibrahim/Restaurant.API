@@ -14,18 +14,19 @@ namespace Restaurant.Application.Services.CustomerSR
 {
     public class CustomerServices : ICustomerServices
     {
-        private readonly IGenericRebosatory<Customer> GenCustomer;
+        //private readonly IGenericRebosatory<Customer> GenCustomer;
         private readonly IUnitOfWork unitOfWork;
         private readonly IMapper mapper;
-        public CustomerServices(IGenericRebosatory<Customer> GenCustomer, IUnitOfWork unitOfWork, IMapper mapper)
+        public CustomerServices( IUnitOfWork unitOfWork, IMapper mapper)
         {
-            this.GenCustomer = GenCustomer;
+            //this.GenCustomer = GenCustomer;
             this.unitOfWork = unitOfWork;
             this.mapper = mapper;
         }
         public async Task<List<AllCustomerDTO>> GetAllAsync()
         {
-           var res=await GenCustomer.GetAll();
+           //var res=await GenCustomer.GetAll();
+           var res=await unitOfWork.Genunit<Customer>().GetAll();
             if(!res.Any())
                 throw new NotFoundException("No Customers Found");
             var data = mapper.Map<List<AllCustomerDTO>>(res);
@@ -33,7 +34,7 @@ namespace Restaurant.Application.Services.CustomerSR
         }
         public async Task<List<AllReviewDTO>> GetAllCustomerReviewAsync(int userid)
         {
-            var customer=await GenCustomer.GetById(c => c.UserId == userid,c=>c.Reviews);
+            var customer=await unitOfWork.Genunit<Customer>().GetById(c => c.UserId == userid,c=>c.Reviews);
             if (customer == null)
                 throw new NotFoundException($"Not Found Customer for this UserId {userid}");
             var res = customer.Reviews;
@@ -44,7 +45,7 @@ namespace Restaurant.Application.Services.CustomerSR
         }
         public async Task<AllCustomerDTO> GetbyidAsync(int id)
         {
-           var res = await GenCustomer.GetById(s=>s.CustomerId==id);
+           var res = await unitOfWork.Genunit<Customer>().GetById(s=>s.CustomerId==id);
             if(res == null)
                 throw new NotFoundException($"Not Found Customer with this Id {id}");
             var data = mapper.Map<AllCustomerDTO>(res);
@@ -52,32 +53,32 @@ namespace Restaurant.Application.Services.CustomerSR
         }
         public async Task<AllCustomerDTO> CreateAsync(CreateCustomerDTO dto, int userid)
         {
-            var exist = await GenCustomer.GetById(s => s.UserId == userid);
+            var exist = await unitOfWork.Genunit<Customer>().GetById(s => s.UserId == userid);
             if (exist != null)
                 throw new BadRequestException("Customer Already Exist for this User");
             var customer = mapper.Map<Customer>(dto);
             customer.UserId = userid;
-            await GenCustomer.Create(customer);
+            await unitOfWork.Genunit<Customer>().Create(customer);
              await unitOfWork.SaveChanges();
             var data = mapper.Map<AllCustomerDTO>(customer);
             return data;
         }
         public async Task<AllCustomerDTO> UpdateAsync(CreateCustomerDTO dto, int userid)
         {
-            var customer = await GenCustomer.GetById(c => c.UserId == userid);
+            var customer = await unitOfWork.Genunit<Customer>().GetById(c => c.UserId == userid);
             mapper.Map(dto, customer);
             customer.UserId = userid;
-            GenCustomer.update(customer);
+            unitOfWork.Genunit<Customer>().update(customer);
             await unitOfWork.SaveChanges();
             var data = mapper.Map<AllCustomerDTO>(customer);
             return data;
         }
         public async Task<bool> DeleteAsync(int userid)
         {
-            var customer = await GenCustomer.GetById(c => c.UserId == userid);
+            var customer = await unitOfWork.Genunit<Customer>().GetById(c => c.UserId == userid);
             if (customer == null)
                 throw new NotFoundException($"Not Found Customer for this UserId {userid}");
-            GenCustomer.delete(customer);
+            unitOfWork.Genunit<Customer>().delete(customer);
             await unitOfWork.SaveChanges();
             return true;
         }
