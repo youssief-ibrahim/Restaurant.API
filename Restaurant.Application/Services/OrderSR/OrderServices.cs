@@ -61,7 +61,7 @@ namespace Restaurant.Application.Services.OrderSR
             return orderDto;
         }
 
-        public async Task<List<AllOrderItemDTO>> GetOrderItemsAsync(int orderId)
+        public  async Task<List<AllOrderItemDTO>> GetOrderItemsAsync(int orderId)
         {
             var res = await GenOrderItem.FindAll(s => s.OrderId == orderId);
             if (!res.Any())

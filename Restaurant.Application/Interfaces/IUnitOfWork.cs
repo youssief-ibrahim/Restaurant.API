@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Restaurant.Domain.Models;
 
 namespace Restaurant.Application.Interfaces
 {
@@ -12,5 +13,8 @@ namespace Restaurant.Application.Interfaces
         Task CommitAsync();
         Task RollbackAsync();
         Task SaveChanges();
+        IGenericRebosatory<T> Genunit<T>() where T : class;
+        //IGenericRebosatory<Meal> MealRepo { get; }
+
     }
 }

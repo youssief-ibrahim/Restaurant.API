@@ -34,7 +34,7 @@ namespace Restaurant.Application.Services.MealSR
         }
         public async Task<AllMealDTO> GetMealByIdAsync(int mealId)
         {
-            var res = await GenMeal.GetById(g => g.MealId == mealId);
+            var res = await unitOfWork.MealRepo.GetById(g => g.MealId == mealId);
             if (res == null)
                 throw new NotFoundException($"Not Found Meal with this Id {mealId}");
 

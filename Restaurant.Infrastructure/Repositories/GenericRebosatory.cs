@@ -8,7 +8,7 @@ namespace Restaurant.Infrastructure.Repositories
     public class GenericRebosatory<T> : IGenericRebosatory<T> where T : class
     {
         private readonly ApplicationDbContext context;
-        public GenericRebosatory(ApplicationDbContext context, IUnitOfWork unitOfWork)
+        public GenericRebosatory(ApplicationDbContext context)
         {
             this.context = context;
         }
