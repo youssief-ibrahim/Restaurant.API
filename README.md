@@ -54,22 +54,22 @@ A full-featured Restaurant Management System built using ASP.NET Core with Clean
 ---
 
 ### 🔐 Account & Authentication
-![Account & Authentication](images/Account & Authentication.png)
+![Account & Authentication](images/Account&Authentication.png)
 
 ---
 
 ### 👨‍🍳 Chart & Chef & Customer
-![Chart](images/chart & Chef & Customer.png)
+![Chart](images/chart&Chef&Customer.png)
 
 ---
 
 ### 🚚 Delivery & Meal & Order
-![Delivery](images/Delivery & Meal & Order.png)
+![Delivery](images/Delivery&Meal&Order.png)
 
 ---
 
 ### 💳 Payment & Review & Role
-![Payment](images/Paymet & Review & Role.png)
+![Payment](images/Paymet&Review&Role.png)
 
 ---
 
