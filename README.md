@@ -28,3 +28,22 @@ A full-featured Restaurant Management System built using ASP.NET Core with Clean
 - Stripe Payment
 - Clean Architecture
 - Repository & Unit of Work Pattern
+
+---
+
+### 📌 Overview
+
+-Built a scalable RESTful API using ASP.NET Core 8 and Clean Architecture.
+- Implemented Generic Repository, Unit of Work Pattern.
+- Secured API with JWT authentication & authorization using ASP.NET Core Identity.
+- Designed and implemented secure account management workflows including email verification, 
+  resend confirmation codes, email change validation, and password reset functionality.
+- Implemented JWT Refresh Tokens & Revoke Token.
+- Integrated Stripe for payment processing.
+- Implemented Localization & Globalization (multi-language and culture support).
+- Full Role & Permission Management (Admin, Customer, Chef, Delivery).
+- Using AutoMapper integrated for mapping between entities & DTOs
+
+---
+
+
