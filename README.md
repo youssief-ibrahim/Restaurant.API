@@ -48,7 +48,7 @@ A full-featured Restaurant Management System built using ASP.NET Core with Clean
 
 ## 📸 Project Screenshots
 
-### 🗄 Database
+### 🗄 Database Diagram
 ![Database](images/Database.png)
 
 ---
@@ -58,17 +58,17 @@ A full-featured Restaurant Management System built using ASP.NET Core with Clean
 
 ---
 
-### 👨‍🍳 Cart, Chef & Customer
+### 👨‍🍳 Cart , Chef & Customer
 ![Chart](images/chart_Chef_Customer.png)
 
 ---
 
-### 🚚 Delivery, Meal & Order
+### 🚚 Delivery , Meal & Order
 ![Delivery](images/Delivary_Meal_Order.png)
 
 ---
 
-### 💳 Payment, Review & Role
+### 💳 Payment , Review & Role
 ![Payment](images/Paymet_Review_Role.png)
 
 ---
