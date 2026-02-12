@@ -58,13 +58,13 @@ A full-featured Restaurant Management System built using ASP.NET Core with Clean
 
 ---
 
-### 👨‍🍳 Chart & Chef & Customer
+### 👨‍🍳 Cart & Chef & Customer
 ![Chart](images/chart_Chef_Customer.png)
 
 ---
 
 ### 🚚 Delivery & Meal & Order
-![Delivery](images/Delivery_Meal_Order.png)
+![Delivery](images/Delivary_Meal_Order.png)
 
 ---
 
