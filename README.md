@@ -6,9 +6,9 @@ A full-featured Restaurant Management System built using ASP.NET Core with Clean
 
 ## 🚀 Features
 
-🔐 Authentication & Authorization (JWT + Refresh Token)
-👤 Account Management (Register, Confirm Email, Reset Password)
-🛒 Cart System
+🔐 Authentication & Authorization (JWT + Refresh Token)-
+👤 Account Management (Register, Confirm Email, Reset Password)-
+🛒 Cart System-
 📦 Orders Management
 💳 Payment Integration (Stripe)
 🚚 Delivery Tracking
