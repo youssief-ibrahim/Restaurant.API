@@ -6,15 +6,15 @@ A full-featured Restaurant Management System built using ASP.NET Core with Clean
 
 ## 🚀 Features
 
-- Authentication & Authorization (JWT + Refresh Token)-
-- Account Management (Register, Confirm Email, Reset Password)-
-- Cart System-
-- Orders Management
+- Authentication & Authorization (JWT + Refresh Token)
+- Account Management (Register, Confirm Email, Reset Password)
+- Cart System
+- Orders
 - Payment Integration (Stripe)
 - Delivery Tracking
 - Reviews System
-- Chef Management
-- Role Management
+- Chef
+- Role
 - Clean Architecture Pattern
 
 ---
