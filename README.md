@@ -33,7 +33,7 @@ A full-featured Restaurant Management System built using ASP.NET Core with Clean
 
 ### 📌 Overview
 
--Built a scalable RESTful API using ASP.NET Core 8 and Clean Architecture.
+- Built a scalable RESTful API using ASP.NET Core 8 and Clean Architecture.
 - Implemented Generic Repository, Unit of Work Pattern.
 - Secured API with JWT authentication & authorization using ASP.NET Core Identity.
 - Designed and implemented secure account management workflows including email verification, 
