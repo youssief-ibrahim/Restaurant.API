@@ -107,7 +107,7 @@ namespace Restaurant.Application.Services.OrderSR
 
                     await unitOfWork.Genunit<OrderItem>().Create(orderItem);
                 }
-                await unitOfWork.SaveChanges();
+                //await unitOfWork.SaveChanges();
                 var payment=new Payment
                 {
                     OrderId = order.OrderId,
@@ -116,7 +116,7 @@ namespace Restaurant.Application.Services.OrderSR
                     Status = PaymentStatus.Pending
                 };
                 await unitOfWork.Genunit<Payment>().Create(payment);
-                await unitOfWork.SaveChanges();
+                //await unitOfWork.SaveChanges();
                 cart.OrderId = order.OrderId;
                 unitOfWork.Genunit<Cart>().update(cart);
                 await unitOfWork.SaveChanges();

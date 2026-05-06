@@ -156,7 +156,7 @@ namespace Restaurant.Infrastructure.Migrations
                     b.HasIndex("CustomerId")
                         .IsUnique();
 
-                    b.ToTable("Carts");
+                    b.ToTable("Carts", (string)null);
                 });
 
             modelBuilder.Entity("Restaurant.Domain.Models.CartItem", b =>
@@ -182,7 +182,7 @@ namespace Restaurant.Infrastructure.Migrations
 
                     b.HasIndex("MealId");
 
-                    b.ToTable("CartItems");
+                    b.ToTable("CartItems", (string)null);
                 });
 
             modelBuilder.Entity("Restaurant.Domain.Models.Chef", b =>
@@ -209,7 +209,7 @@ namespace Restaurant.Infrastructure.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Chefs");
+                    b.ToTable("Chefs", (string)null);
                 });
 
             modelBuilder.Entity("Restaurant.Domain.Models.Customer", b =>
@@ -232,7 +232,7 @@ namespace Restaurant.Infrastructure.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Customers");
+                    b.ToTable("Customers", (string)null);
                 });
 
             modelBuilder.Entity("Restaurant.Domain.Models.Delivery", b =>
@@ -267,7 +267,7 @@ namespace Restaurant.Infrastructure.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Deliveries");
+                    b.ToTable("Deliveries", (string)null);
                 });
 
             modelBuilder.Entity("Restaurant.Domain.Models.Meal", b =>
@@ -295,7 +295,7 @@ namespace Restaurant.Infrastructure.Migrations
 
                     b.HasIndex("ChefId");
 
-                    b.ToTable("Meals");
+                    b.ToTable("Meals", (string)null);
                 });
 
             modelBuilder.Entity("Restaurant.Domain.Models.Order", b =>
@@ -322,7 +322,7 @@ namespace Restaurant.Infrastructure.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("Orders");
+                    b.ToTable("Orders", (string)null);
                 });
 
             modelBuilder.Entity("Restaurant.Domain.Models.OrderItem", b =>
@@ -351,7 +351,7 @@ namespace Restaurant.Infrastructure.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("OrderItems");
+                    b.ToTable("OrderItems", (string)null);
                 });
 
             modelBuilder.Entity("Restaurant.Domain.Models.Payment", b =>
@@ -366,6 +366,7 @@ namespace Restaurant.Infrastructure.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("ClientSecret")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
@@ -382,6 +383,7 @@ namespace Restaurant.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("StripePaymentIntentId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("PaymentId");
@@ -389,7 +391,7 @@ namespace Restaurant.Infrastructure.Migrations
                     b.HasIndex("OrderId")
                         .IsUnique();
 
-                    b.ToTable("Payment");
+                    b.ToTable("Payment", (string)null);
                 });
 
             modelBuilder.Entity("Restaurant.Domain.Models.Review", b =>
@@ -422,7 +424,7 @@ namespace Restaurant.Infrastructure.Migrations
 
                     b.HasIndex("MealId");
 
-                    b.ToTable("Reviews");
+                    b.ToTable("Reviews", (string)null);
                 });
 
             modelBuilder.Entity("Restaurant.Infrastructure.Identity.AppilcationUser", b =>
@@ -698,7 +700,8 @@ namespace Restaurant.Infrastructure.Migrations
                     b.HasOne("Restaurant.Domain.Models.Order", "Order")
                         .WithOne("Payment")
                         .HasForeignKey("Restaurant.Domain.Models.Payment", "OrderId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Order");
                 });
@@ -724,7 +727,7 @@ namespace Restaurant.Infrastructure.Migrations
 
             modelBuilder.Entity("Restaurant.Infrastructure.Identity.AppilcationUser", b =>
                 {
-                    b.OwnsMany("Restaurant.Infrastructure.Identity.RefreshToken", "RefreshTokens", b1 =>
+                    b.OwnsMany("Restaurant.Infrastructure.Identity.AppilcationUser.RefreshTokens#Restaurant.Infrastructure.Identity.RefreshToken", "RefreshTokens", b1 =>
                         {
                             b1.Property<int>("AppilcationUserId")
                                 .HasColumnType("int");
@@ -750,7 +753,7 @@ namespace Restaurant.Infrastructure.Migrations
 
                             b1.HasKey("AppilcationUserId", "Id");
 
-                            b1.ToTable("RefreshToken");
+                            b1.ToTable("RefreshToken", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("AppilcationUserId");

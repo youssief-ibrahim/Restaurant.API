@@ -12,11 +12,9 @@ namespace Restaurant.Infrastructure.Services.Email
     {
         public async Task SendEmailAsync(string Email, string subject, string body)
         {
-            // Your Gmail
-            var fromMail = "youssiefibrahim3@gmail.com";
+            var fromMail = "";
 
-            // Your App Password (NOT Gmail password)
-            var fromPassword = "eyhk ucfi zuvl eqgn";
+            var fromPassword = "";
             var message = new MailMessage();
             message.From = new MailAddress(fromMail);
             message.To.Add(new MailAddress(Email));
